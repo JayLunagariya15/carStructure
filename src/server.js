@@ -5,10 +5,8 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', true);
 const {Connection} = require('./config/db');
-const Router = require('./router/router')
-
+const Router = require('./router/router')   
 require("dotenv").config();
-
 const PORT = 3000 || 8080 
 
 app.use(cors());

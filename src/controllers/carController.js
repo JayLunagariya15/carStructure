@@ -2,44 +2,6 @@ const car = require('../model/carSchema');
 const user = require('../model/userSchema');
 const brand = require('../model/brandSchema');
 
-
-//create car data
-// const carDetail = async(req,res)=>{
-//     const {carname, model, type,price} = req.body
-
-//     try{
-//         const carData = await car.create(req.body);
-
-//         res.status(200).json(carData);
-//     }catch(err){
-//         console.log(err);
-//         res.status(400).json({message: err.message});
-//     };
-// };
-
-
-//getall car with highest price
-// const getCar = async(req,res)=>{
-//     const {brand, carname, model, type,price} = req.body
-
-//     try{
-//         const hPrice = await car.find({},{price:1,carname:1,_id:0}).sort({price:-1}).limit(20);
-
-//         // const hPrice = await car.find({})
-//         //                         .populate({path: 'brand', option: {sort: {'price':-1}}});
-
-//         // .find({})
-//         // .populate({path: 'Members', options: { sort: { 'created_at': -1 } } })
-
-// console.log(hPrice, "hPrice");
-//         res.status(200).json(hPrice);
-//     }catch(err){
-//         console.log(err);
-//         res.status(400).json({message: err.message});
-//     };
-// };
-
-
 //car and brand link
 const carData = async(req,res)=>{
     const {username, brandname, cars, carname,type,price} = req.body
@@ -80,10 +42,10 @@ const carData = async(req,res)=>{
 
 //get all the detail by using only username
 const getDetail = async(req,res)=>{
-    const {username,brandname} = req.body
+    // const {username,brandname} = req.body
     try{
         
-        const getdetail = await user.find({username:username},{username:1,_id:0})
+        const getdetail = await user.find({})
         .populate('company')
         .populate({path: 'cars', options:{ sort: {price : -1 }, limit: 2} });
         // .populate({path: 'company'}).populate({ path: 'cars'})
@@ -95,6 +57,30 @@ const getDetail = async(req,res)=>{
     };
 };
 
+// get data using query populating three schema
+const getData = async(req,res)=>{
+    const {username, carname,  model, price, type} = req.query
+    try {
+        const gdata = await user.findOne({username:username}).populate({path: "company"}).populate({path:"cars"});
+        console.log("successfully getting data");
 
-module.exports ={carData, getDetail};
+        res.status(200).json(gdata)
+    }catch(err){
+        res.status(400).json({message: err.message})
+    }
+};
+
+
+//match 
+const match = async(req,res)=>{
+    const {username, carname , brandname ,company ,cars} = req.body
+    try{    
+        const mat = await user.find({},{username:1}).populate("company","brandname" ,{_id:0}).populate({path:"cars", match:{carname:carname}})
+        res.status(200).json(mat)
+    }catch(err){
+        res.status(400).json({message: err.message})
+    }
+}
+
+module.exports ={carData, getDetail , getData, match};
 // carDetail,getCar , add in module.export if needed for only add data of car
